@@ -65,10 +65,54 @@
       }
     ],
     alerts: [
-      { id: "alt-001", type: "Data exfiltration pattern", severity: "Critical", timestamp: "09:42", status: "Investigating", deviceId: "dev-001" },
-      { id: "alt-002", type: "Privilege escalation attempt", severity: "High", timestamp: "09:29", status: "Blocked", deviceId: "dev-004" },
-      { id: "alt-003", type: "Impossible travel login", severity: "Medium", timestamp: "08:57", status: "Investigating", deviceId: "dev-003" },
-      { id: "alt-004", type: "Sensitive file shared externally", severity: "High", timestamp: "08:31", status: "Open", deviceId: "dev-001" }
+      {
+        id: "alt-001",
+        type: "Data exfiltration pattern",
+        severity: "Critical",
+        timestamp: "09:42",
+        status: "Investigating",
+        deviceId: "dev-001",
+        ipAddress: "103.214.67.18",
+        openedTabs: ["Billing archive", "Payroll export", "External cloud storage"],
+        suspiciousBehaviors: ["Copied 1.8 GB of files in 7 minutes", "Accessed payroll records outside normal hours", "Attempted upload to an unapproved destination"],
+        highAlertReason: "Large-volume sensitive data movement matched an exfiltration pattern and crossed the critical policy threshold."
+      },
+      {
+        id: "alt-002",
+        type: "Privilege escalation attempt",
+        severity: "High",
+        timestamp: "09:29",
+        status: "Blocked",
+        deviceId: "dev-004",
+        ipAddress: "10.24.18.42",
+        openedTabs: ["Local admin console", "PowerShell history", "System settings"],
+        suspiciousBehaviors: ["Unexpected script launched", "Privilege escalation command detected", "Device attempted lateral access after the script ran"],
+        highAlertReason: "The device attempted elevated execution and was automatically quarantined to prevent spread."
+      },
+      {
+        id: "alt-003",
+        type: "Impossible travel login",
+        severity: "Medium",
+        timestamp: "08:57",
+        status: "Investigating",
+        deviceId: "dev-003",
+        ipAddress: "185.72.91.204",
+        openedTabs: ["CRM dashboard", "Lead export", "Account settings"],
+        suspiciousBehaviors: ["Login location changed too quickly to be physically possible", "Session opened after a recent login from another region", "MFA challenge was delayed"],
+        highAlertReason: "The account showed a location anomaly consistent with possible credential misuse."
+      },
+      {
+        id: "alt-004",
+        type: "Sensitive file shared externally",
+        severity: "High",
+        timestamp: "08:31",
+        status: "Open",
+        deviceId: "dev-001",
+        ipAddress: "103.214.67.18",
+        openedTabs: ["Invoice folder", "Vendor contracts", "Public share settings"],
+        suspiciousBehaviors: ["External share link created", "Restricted folder accessed repeatedly", "Link permissions widened beyond policy"],
+        highAlertReason: "A sensitive file was exposed outside the company boundary with permissive sharing settings."
+      }
     ],
     recommendations: [
       {
@@ -244,13 +288,12 @@
         <section class="landing-section" id="pricing">
           <div class="landing-container">
             <div class="section-heading">
-              <p class="section-kicker">Pricing preview</p>
-              <h2>Start with the controls your team needs now.</h2>
+              <p class="section-kicker">Plan enquiries</p>
+              <h2>Choose the plan that fits, then enquire for details.</h2>
             </div>
             <div class="pricing-grid">
               ${pricingCard({
                 name: "Basic",
-                price: "$49",
                 description: "For small teams getting device visibility and breach awareness in place.",
                 included: ["Up to 25 monitored devices", "Core breach alerts", "Device status tracking", "Activity feed", "Email alert summaries"],
                 excluded: ["AI recommendations", "Automated threat blocking", "Advanced insider risk scoring"],
@@ -258,7 +301,6 @@
               })}
               ${pricingCard({
                 name: "Advanced",
-                price: "$149",
                 description: "For growing businesses that need active detection, risk scoring, and guided response.",
                 included: ["Up to 100 monitored devices", "Real-time breach alerts", "Insider risk analysis", "Live threat dashboard", "AI-powered recommendations", "Priority policy templates"],
                 excluded: ["Custom compliance reporting", "Dedicated response workflow design"],
@@ -266,7 +308,6 @@
               })}
               ${pricingCard({
                 name: "Premium",
-                price: "$299",
                 description: "For teams standardizing prevention, response, and security operations across the business.",
                 included: ["Unlimited monitored devices", "Automated threat blocking", "Advanced AI recommendations", "Custom policy recommendations", "Executive risk reporting", "Priority support workflows"],
                 excluded: ["On-site incident response", "Custom enterprise integrations"],
@@ -289,6 +330,10 @@
 
     app.querySelectorAll("[data-enter-app]").forEach((button) => {
       button.addEventListener("click", renderAuth);
+    });
+
+    app.querySelectorAll("[data-enquire-plan]").forEach((button) => {
+      button.addEventListener("click", () => openPlanEnquiry(button.dataset.enquirePlan));
     });
   }
 
@@ -316,9 +361,9 @@
     return `
       <article class="pricing-card ${plan.featured ? "featured" : ""}">
         <div>
-          <span class="pricing-label">${plan.featured ? "Most useful" : "Sample plan"}</span>
+          <span class="pricing-label">${plan.featured ? "Most useful" : "Enquire plan"}</span>
           <h3>${plan.name}</h3>
-          <div class="plan-price"><span>${plan.price}</span><small>/month</small></div>
+          <div class="plan-enquiry">Enquire for plan details</div>
           <p>${plan.description}</p>
         </div>
         <div class="plan-details">
@@ -335,9 +380,61 @@
             </ul>
           </div>
         </div>
-        <button class="secondary-btn" data-enter-app>Choose ${plan.name}</button>
+        <button class="secondary-btn" data-enquire-plan="${plan.name}">Enquire about ${plan.name}</button>
       </article>
     `;
+  }
+
+  function planGuidelines(planName) {
+    return {
+      Basic: [
+        "Best suited for smaller teams beginning with device visibility and breach awareness.",
+        "Keep an estimate of the number of devices you want monitored ready before enquiring.",
+        "Ask about alert setup, onboarding time, and whether your current devices are supported."
+      ],
+      Advanced: [
+        "Recommended for growing businesses that need active detection and guided response.",
+        "Be ready to discuss your current device count, insider-risk concerns, and alert workflow.",
+        "Ask about AI recommendations, dashboard access, and rollout support for your team."
+      ],
+      Premium: [
+        "Designed for teams that want broader prevention, automation, and reporting coverage.",
+        "Prepare your expected scale, policy needs, and any reporting or workflow requirements.",
+        "Ask about automated blocking, support expectations, and customization options."
+      ]
+    }[planName] || [];
+  }
+
+  function openPlanEnquiry(planName) {
+    const existingModal = document.querySelector(".enquiry-modal");
+    if (existingModal) existingModal.remove();
+
+    const message = encodeURIComponent(`Hello, I would like to enquire about the ${planName} plan for Phantom Shield.`);
+    const whatsappUrl = `https://wa.me/919930868762?text=${message}`;
+
+    const modal = document.createElement("div");
+    modal.className = "enquiry-modal";
+    modal.innerHTML = `
+      <div class="enquiry-dialog" role="dialog" aria-modal="true" aria-labelledby="enquiry-title">
+        <button class="enquiry-close" type="button" aria-label="Close enquiry guidelines">&times;</button>
+        <p class="section-kicker">Before you enquire</p>
+        <h3 id="enquiry-title">${planName} plan guidelines</h3>
+        <ul>
+          ${planGuidelines(planName).map((item) => `<li>${item}</li>`).join("")}
+        </ul>
+        <a class="primary-btn enquiry-whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer">
+          Continue on WhatsApp
+        </a>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest(".enquiry-close")) {
+        modal.remove();
+      }
+    });
   }
 
   function renderAuth() {
@@ -646,7 +743,7 @@
           <div class="panel-header">
             <div>
               <h2 class="panel-title">Threat Queue</h2>
-              <p class="panel-subtitle">Resolve validated items or block high-risk activity instantly.</p>
+              <p class="panel-subtitle">Review suspicious activity, inspect evidence, and block or unblock accounts when needed.</p>
             </div>
             <button class="secondary-btn" data-action="new-alert">Generate alert</button>
           </div>
@@ -674,7 +771,7 @@
 
   function alertRow(alert) {
     const device = getDevice(alert.deviceId);
-    const closed = ["Resolved", "Blocked"].includes(alert.status);
+    const blocked = alert.status === "Blocked";
 
     return `
       <tr>
@@ -685,8 +782,11 @@
         <td>${device.name}</td>
         <td>
           <div class="action-row">
-            <button class="table-action resolve" data-resolve="${alert.id}" ${closed ? "disabled" : ""}>Resolve</button>
-            <button class="table-action block" data-block="${alert.id}" ${closed ? "disabled" : ""}>Block</button>
+            <button class="table-action enquire" data-enquire-alert="${alert.id}">Enquire</button>
+            ${blocked
+              ? `<button class="table-action unblock" data-unblock="${alert.id}">Unblock</button>`
+              : `<button class="table-action block" data-block="${alert.id}">Block</button>`
+            }
           </div>
         </td>
       </tr>
@@ -751,12 +851,16 @@
       });
     });
 
-    document.querySelectorAll("[data-resolve]").forEach((button) => {
-      button.addEventListener("click", () => updateAlert(button.dataset.resolve, "Resolved"));
+    document.querySelectorAll("[data-enquire-alert]").forEach((button) => {
+      button.addEventListener("click", () => openAlertEnquiry(button.dataset.enquireAlert));
     });
 
     document.querySelectorAll("[data-block]").forEach((button) => {
       button.addEventListener("click", () => updateAlert(button.dataset.block, "Blocked"));
+    });
+
+    document.querySelectorAll("[data-unblock]").forEach((button) => {
+      button.addEventListener("click", () => unblockAlert(button.dataset.unblock));
     });
 
     document.querySelectorAll("[data-apply]").forEach((button) => {
@@ -790,12 +894,74 @@
     }
 
     mockData.feed.unshift({
-      title: status === "Blocked" ? "Threat blocked" : "Alert resolved",
+      title: status === "Blocked" ? "Threat blocked" : "Alert updated",
       time: currentTime(),
       body: `${alert.type} on ${device.name} was marked ${status.toLowerCase()} by ${mockData.user.name}.`
     });
 
     renderDashboard();
+  }
+
+  function unblockAlert(id) {
+    const alert = mockData.alerts.find((item) => item.id === id);
+    if (!alert) return;
+
+    alert.status = "Investigating";
+    const device = getDevice(alert.deviceId);
+    device.status = "Online";
+    device.risk = Math.min(96, device.risk + 10);
+
+    mockData.feed.unshift({
+      title: "Account unblocked",
+      time: currentTime(),
+      body: `${device.name} was unblocked after review and returned to investigating status.`
+    });
+
+    renderDashboard();
+  }
+
+  function openAlertEnquiry(id) {
+    const alert = mockData.alerts.find((item) => item.id === id);
+    if (!alert) return;
+
+    const device = getDevice(alert.deviceId);
+    const existingModal = document.querySelector(".alert-modal");
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement("div");
+    modal.className = "alert-modal";
+    modal.innerHTML = `
+      <div class="alert-dialog" role="dialog" aria-modal="true" aria-labelledby="alert-enquiry-title">
+        <button class="alert-close" type="button" aria-label="Close alert details">&times;</button>
+        <p class="section-kicker">Suspicious account enquiry</p>
+        <h3 id="alert-enquiry-title">${alert.type}</h3>
+        <div class="alert-summary-grid">
+          <div><span>Device</span><strong>${device.name}</strong></div>
+          <div><span>IP address</span><strong>${alert.ipAddress}</strong></div>
+          <div><span>Severity</span><strong>${alert.severity}</strong></div>
+          <div><span>Status</span><strong>${alert.status}</strong></div>
+        </div>
+        <div class="alert-detail-block">
+          <h4>Tabs opened</h4>
+          <ul>${alert.openedTabs.map((item) => `<li>${item}</li>`).join("")}</ul>
+        </div>
+        <div class="alert-detail-block">
+          <h4>Suspicious behaviours</h4>
+          <ul>${alert.suspiciousBehaviors.map((item) => `<li>${item}</li>`).join("")}</ul>
+        </div>
+        <div class="alert-detail-block">
+          <h4>Why this device is on alert</h4>
+          <p>${alert.highAlertReason}</p>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest(".alert-close")) {
+        modal.remove();
+      }
+    });
   }
 
   function applyRecommendation(id) {
@@ -848,7 +1014,11 @@
       severity,
       timestamp: currentTime(),
       status: "Open",
-      deviceId: device.id
+      deviceId: device.id,
+      ipAddress: "192.168.10.24",
+      openedTabs: ["Security dashboard", "Shared files", "Browser download history"],
+      suspiciousBehaviors: ["Unusual activity spike detected", "Policy deviation observed", "Device behavior differed from its recent baseline"],
+      highAlertReason: "Recent behavior crossed the monitoring threshold and requires analyst review."
     };
 
     mockData.alerts.unshift(alert);
