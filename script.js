@@ -9,143 +9,10 @@
     selectedRole: "Admin",
     selectedDeviceId: "dev-001",
     simulationTick: 0,
-    devices: [
-      {
-        id: "dev-001",
-        name: "Finance-Laptop-07",
-        owner: "Maya Singh",
-        type: "Windows endpoint",
-        status: "Online",
-        risk: 72,
-        lastActivity: "2 min ago",
-        logs: [
-          { time: "09:42", title: "Unusual export volume", detail: "1.8 GB copied from billing archive to local Downloads.", suspicious: true },
-          { time: "09:31", title: "VPN re-authenticated", detail: "Device restored secure tunnel through Mumbai gateway.", suspicious: false },
-          { time: "09:15", title: "Policy sync", detail: "Endpoint received updated DLP rule set.", suspicious: false }
-        ]
-      },
-      {
-        id: "dev-002",
-        name: "Ops-Tablet-03",
-        owner: "Arjun Mehta",
-        type: "iPadOS mobile",
-        status: "Online",
-        risk: 31,
-        lastActivity: "6 min ago",
-        logs: [
-          { time: "09:38", title: "Location changed", detail: "Device moved from office network to managed LTE.", suspicious: false },
-          { time: "09:21", title: "Application check", detail: "Inventory scan found all required security agents active.", suspicious: false }
-        ]
-      },
-      {
-        id: "dev-003",
-        name: "Sales-MacBook-11",
-        owner: "Neha Kapoor",
-        type: "macOS endpoint",
-        status: "Online",
-        risk: 48,
-        lastActivity: "1 min ago",
-        logs: [
-          { time: "09:46", title: "New SaaS session", detail: "CRM login verified with compliant device posture.", suspicious: false },
-          { time: "09:04", title: "Attachment scan", detail: "Inbound proposal file cleared sandbox inspection.", suspicious: false }
-        ]
-      },
-      {
-        id: "dev-004",
-        name: "Warehouse-PC-02",
-        owner: "Shared kiosk",
-        type: "Windows kiosk",
-        status: "Quarantined",
-        risk: 91,
-        lastActivity: "11 min ago",
-        logs: [
-          { time: "09:29", title: "Command shell opened", detail: "Unexpected script attempted privilege escalation.", suspicious: true },
-          { time: "09:28", title: "Network isolation", detail: "Automated containment moved device to quarantine VLAN.", suspicious: true }
-        ]
-      }
-    ],
-    alerts: [
-      {
-        id: "alt-001",
-        type: "Data exfiltration pattern",
-        severity: "Critical",
-        timestamp: "09:42",
-        status: "Investigating",
-        deviceId: "dev-001",
-        ipAddress: "103.214.67.18",
-        openedTabs: ["Billing archive", "Payroll export", "External cloud storage"],
-        suspiciousBehaviors: ["Copied 1.8 GB of files in 7 minutes", "Accessed payroll records outside normal hours", "Attempted upload to an unapproved destination"],
-        highAlertReason: "Large-volume sensitive data movement matched an exfiltration pattern and crossed the critical policy threshold."
-      },
-      {
-        id: "alt-002",
-        type: "Privilege escalation attempt",
-        severity: "High",
-        timestamp: "09:29",
-        status: "Blocked",
-        deviceId: "dev-004",
-        ipAddress: "10.24.18.42",
-        openedTabs: ["Local admin console", "PowerShell history", "System settings"],
-        suspiciousBehaviors: ["Unexpected script launched", "Privilege escalation command detected", "Device attempted lateral access after the script ran"],
-        highAlertReason: "The device attempted elevated execution and was automatically quarantined to prevent spread."
-      },
-      {
-        id: "alt-003",
-        type: "Impossible travel login",
-        severity: "Medium",
-        timestamp: "08:57",
-        status: "Investigating",
-        deviceId: "dev-003",
-        ipAddress: "185.72.91.204",
-        openedTabs: ["CRM dashboard", "Lead export", "Account settings"],
-        suspiciousBehaviors: ["Login location changed too quickly to be physically possible", "Session opened after a recent login from another region", "MFA challenge was delayed"],
-        highAlertReason: "The account showed a location anomaly consistent with possible credential misuse."
-      },
-      {
-        id: "alt-004",
-        type: "Sensitive file shared externally",
-        severity: "High",
-        timestamp: "08:31",
-        status: "Open",
-        deviceId: "dev-001",
-        ipAddress: "103.214.67.18",
-        openedTabs: ["Invoice folder", "Vendor contracts", "Public share settings"],
-        suspiciousBehaviors: ["External share link created", "Restricted folder accessed repeatedly", "Link permissions widened beyond policy"],
-        highAlertReason: "A sensitive file was exposed outside the company boundary with permissive sharing settings."
-      }
-    ],
-    recommendations: [
-      {
-        id: "rec-001",
-        title: "Tighten finance data movement policy",
-        severity: "High",
-        explanation: "Finance-Laptop-07 copied a high-volume billing archive outside the normal accounting window.",
-        action: "Apply DLP rule",
-        applied: false
-      },
-      {
-        id: "rec-002",
-        title: "Require step-up verification for CRM sessions",
-        severity: "Medium",
-        explanation: "The sales account had a login pattern consistent with impossible travel within a short interval.",
-        action: "Enforce MFA",
-        applied: false
-      },
-      {
-        id: "rec-003",
-        title: "Keep kiosk endpoints in restricted mode",
-        severity: "Critical",
-        explanation: "Warehouse-PC-02 attempted elevated script execution and is already isolated from production systems.",
-        action: "Extend quarantine",
-        applied: false
-      }
-    ],
-    feed: [
-      { title: "Automated block completed", time: "09:43", body: "Outbound transfer from Finance-Laptop-07 was stopped before external upload finished." },
-      { title: "Insider risk score changed", time: "09:42", body: "Maya Singh moved from moderate to elevated risk due to unusual archive movement." },
-      { title: "Threat intelligence updated", time: "09:36", body: "New indicators added for credential phishing kits targeting SMB finance teams." },
-      { title: "Device quarantine confirmed", time: "09:29", body: "Warehouse-PC-02 was moved to a restricted network segment." }
-    ]
+    devices: [],
+    alerts: [],
+    recommendations: [],
+    feed: []
   };
 
   const navItems = [
@@ -169,7 +36,7 @@
   }
 
   function getDevice(id) {
-    return mockData.devices.find((device) => device.id === id) || mockData.devices[0];
+    return mockData.devices.find((device) => device.id === id) || mockData.devices[0] || null;
   }
 
   function activeAlerts() {
@@ -177,6 +44,7 @@
   }
 
   function averageRisk() {
+    if (!mockData.devices.length) return 0;
     const total = mockData.devices.reduce((sum, device) => sum + device.risk, 0);
     return Math.round(total / mockData.devices.length);
   }
@@ -596,7 +464,7 @@
       <div class="view">
         <section class="metric-grid">
           ${metricCard("Active threats", activeAlerts().length, `${blockedCount} blocked today`, "Open incidents needing review")}
-          ${metricCard("Devices monitored", mockData.devices.length, "+1 joined session", "Endpoints, mobiles, and kiosks")}
+          ${metricCard("Devices monitored", mockData.devices.length, "No new devices", "Endpoints, mobiles, and kiosks")}
           ${metricCard("Risk level", getRiskLevel(risk), `${risk}/100`, "Blended insider and endpoint score")}
         </section>
         <section class="dashboard-grid">
@@ -606,10 +474,12 @@
                 <h2 class="panel-title">Live Threat Tracking</h2>
                 <p class="panel-subtitle">Signal density by category across monitored devices.</p>
               </div>
-              <button class="secondary-btn" data-action="simulate-threat">Simulate update</button>
+              <button class="secondary-btn" data-action="simulate-threat" ${mockData.devices.length ? "" : "disabled"}>Simulate update</button>
             </div>
             <div class="threat-chart">
-              ${threatTypes.map((type, index) => chartRow(type, threatScore(index), index)).join("")}
+              ${mockData.devices.length || mockData.alerts.length
+                ? threatTypes.map((type, index) => chartRow(type, threatScore(index), index)).join("")
+                : emptyState("No threat signals yet", "Signal density will appear after devices or alerts are added.")}
             </div>
           </div>
           <div class="panel">
@@ -620,7 +490,9 @@
               </div>
             </div>
             <div class="activity-feed">
-              ${mockData.feed.slice(0, 6).map(feedItem).join("")}
+              ${mockData.feed.length
+                ? mockData.feed.slice(0, 6).map(feedItem).join("")
+                : emptyState("No activity yet", "Events will appear here after devices and alerts are added.")}
             </div>
           </div>
         </section>
@@ -666,8 +538,33 @@
     `;
   }
 
+  function emptyState(title, body) {
+    return `
+      <div class="empty-state">
+        <h3>${title}</h3>
+        <p>${body}</p>
+      </div>
+    `;
+  }
+
   function devicesView() {
     const selected = getDevice(mockData.selectedDeviceId);
+
+    if (!selected) {
+      return `
+        <div class="view">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Monitored Devices</h2>
+                <p class="panel-subtitle">Select an asset to inspect logs and risk drivers.</p>
+              </div>
+            </div>
+            ${emptyState("No devices yet", "Add devices through the API to populate this workspace.")}
+          </section>
+        </div>
+      `;
+    }
 
     return `
       <div class="view device-layout">
@@ -760,7 +657,9 @@
                 </tr>
               </thead>
               <tbody>
-                ${mockData.alerts.map(alertRow).join("")}
+                ${mockData.alerts.length
+                  ? mockData.alerts.map(alertRow).join("")
+                  : `<tr><td colspan="6">${emptyState("No alerts yet", "Threats will appear here when alert records are created.")}</td></tr>`}
               </tbody>
             </table>
           </div>
@@ -779,7 +678,7 @@
         <td><span class="badge ${className(alert.severity)}">${alert.severity}</span></td>
         <td>${alert.timestamp}</td>
         <td><span class="badge ${className(alert.status)}">${alert.status}</span></td>
-        <td>${device.name}</td>
+        <td>${device ? device.name : "Unassigned"}</td>
         <td>
           <div class="action-row">
             <button class="table-action enquire" data-enquire-alert="${alert.id}">Enquire</button>
@@ -806,7 +705,9 @@
             </div>
           </div>
           <div class="recommendation-list">
-            ${mockData.recommendations.map(recommendationCard).join("")}
+            ${mockData.recommendations.length
+              ? mockData.recommendations.map(recommendationCard).join("")
+              : emptyState("No recommendations yet", "AI actions will appear after alerts and device signals are available.")}
           </div>
         </section>
         <aside class="panel">
@@ -819,7 +720,7 @@
           <div class="insight-stack">
             <div class="insight"><span class="insight-label">Recommendations applied</span><span class="insight-value">${applied}/${mockData.recommendations.length}</span></div>
             <div class="insight"><span class="insight-label">Projected risk reduction</span><span class="insight-value">${applied * 11}%</span></div>
-            <div class="insight"><span class="insight-label">Highest pressure area</span><span class="insight-value">Data Loss</span></div>
+            <div class="insight"><span class="insight-label">Highest pressure area</span><span class="insight-value">${mockData.alerts.length ? "Data Loss" : "None"}</span></div>
           </div>
         </aside>
       </div>
@@ -984,6 +885,7 @@
   }
 
   function simulateThreatUpdate() {
+    if (!mockData.devices.length) return;
     mockData.simulationTick += 1;
     const target = mockData.devices[mockData.simulationTick % mockData.devices.length];
     target.risk = Math.min(96, target.risk + 7);
@@ -1005,6 +907,7 @@
   }
 
   function generateAlert() {
+    if (!mockData.devices.length) return;
     const device = mockData.devices[Math.floor(Math.random() * mockData.devices.length)];
     const severity = device.risk > 70 ? "High" : "Medium";
     const id = `alt-${String(Date.now()).slice(-6)}`;
@@ -1037,7 +940,7 @@
 
   // Keep the prototype alive with a measured, investor-demo friendly live update loop.
   setInterval(() => {
-    if (!mockData.user) return;
+    if (!mockData.user || !mockData.devices.length) return;
     mockData.simulationTick += 1;
     const device = mockData.devices[mockData.simulationTick % mockData.devices.length];
     device.lastActivity = "Just now";
