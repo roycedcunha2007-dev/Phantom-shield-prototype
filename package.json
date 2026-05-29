@@ -1,0 +1,27 @@
+{
+  "name": "phantom-shield-prototype",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roycedcunha2007-dev/Phantom-shield-prototype.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/roycedcunha2007-dev/Phantom-shield-prototype/issues"
+  },
+  "homepage": "https://github.com/roycedcunha2007-dev/Phantom-shield-prototype#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

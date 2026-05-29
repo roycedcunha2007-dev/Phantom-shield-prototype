@@ -1,5 +1,5 @@
 export type Role = "Employee" | "Admin";
-export type DeviceStatus = "Online" | "Quarantined";
+export type DeviceStatus = "Online" | "Offline" | "Quarantined";
 export type Severity = "Low" | "Medium" | "High" | "Critical";
 export type AlertStatus = "Open" | "Investigating" | "Blocked" | "Resolved";
 
@@ -53,4 +53,37 @@ export interface ActivityFeedItem {
   title: string;
   time: string;
   body: string;
+}
+
+export interface AIRecommendation {
+  id: string;
+  deviceId: string;
+  title: string;
+  description: string;
+  confidence: number;
+  status: string;
+  reason: string;
+  contributingFactors: string[];
+  createdAt?: string;
+}
+
+export interface AIAnalysis {
+  id: string;
+  deviceId: string;
+  anomalyScore: number;
+  riskScore: number;
+  classification: "Normal" | "Suspicious" | "High Risk" | "Critical";
+  confidence: number;
+  features: Record<string, number>;
+  userRiskScore: number;
+  organizationRiskScore: number;
+  insiderRiskScore: number;
+  createdAt?: string;
+  recommendations?: AIRecommendation[];
+}
+
+export interface AIRiskResponse {
+  organizationRiskScore: number;
+  latest: AIAnalysis | null;
+  items: AIAnalysis[];
 }

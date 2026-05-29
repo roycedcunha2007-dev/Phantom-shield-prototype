@@ -20,6 +20,17 @@ export function DeviceCard({ device, active, onSelect }: { device: Device; activ
         <Badge value="info">{device.lastActivity}</Badge>
       </div>
       <RiskMeter score={device.risk} compact />
+      
+      {active && (
+        <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+          <button 
+            onClick={(e) => { e.stopPropagation(); alert(`Simulated network isolation for ${device.name}`); }} 
+            style={{ padding: "0.5rem", background: "var(--danger)", color: "white", border: "none", borderRadius: "4px", fontSize: "0.75rem", cursor: "pointer" }}
+          >
+            Quarantine Device
+          </button>
+        </div>
+      )}
     </button>
   );
 }

@@ -9,3 +9,11 @@ passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
 pyjwt==2.8.0
 python-dotenv==1.0.1
+asyncpg==0.29.0
+numpy==2.1.1
+pandas==2.2.2
+scikit-learn==1.5.2
+joblib==1.4.2
+# Future-ready AI stack:
+# torch
+# tensorflow
